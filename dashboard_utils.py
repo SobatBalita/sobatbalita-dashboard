@@ -1,4 +1,5 @@
 from pathlib import Path
+import base64
 
 import pandas as pd
 import plotly.express as px
@@ -6,6 +7,8 @@ import streamlit as st
 
 
 DATA_PATH = Path(__file__).parent / "data" / "df_clean.csv"
+ASSETS_DIR = Path(__file__).parent / "assets"
+LOGO_PATH = ASSETS_DIR / "277937024.png"
 
 COLOR_MAP = {
     "Normal": "#2A9D8F",
@@ -30,6 +33,39 @@ WASTING_ORDER = [
     "Severely Underweight",
 ]
 AGE_GROUP_ORDER = ["0-5 bulan", "6-11 bulan", "12-23 bulan", "24-35 bulan", "36+ bulan"]
+
+DISPLAY_LABELS = {
+    "jenis_kelamin": "Jenis kelamin",
+    "umur_bulan": "Umur balita (bulan)",
+    "tinggi_badan_cm": "Tinggi badan (cm)",
+    "berat_badan_kg": "Berat badan (kg)",
+    "stunting": "Kategori stunting",
+    "wasting": "Kategori wasting",
+    "stunting_status": "Status stunting",
+    "risiko_stunting": "Risiko stunting",
+    "risiko_wasting": "Risiko wasting",
+    "kelompok_umur": "Kelompok umur",
+    "jumlah": "Jumlah balita",
+    "status": "Status gizi",
+    "status_wasting": "Status wasting",
+    "Status": "Status gizi",
+    "Jumlah": "Jumlah balita",
+    "Persentase": "Persentase balita",
+    "Jenis kelamin": "Jenis kelamin",
+    "Indikator": "Indikator gizi",
+    "Stunting (%)": "Stunting (%)",
+    "Wasting (%)": "Wasting (%)",
+}
+
+TABLE_COLUMN_LABELS = {
+    "jenis_kelamin": "Jenis kelamin",
+    "umur_bulan": "Umur balita (bulan)",
+    "tinggi_badan_cm": "Tinggi badan (cm)",
+    "berat_badan_kg": "Berat badan (kg)",
+    "stunting": "Kategori stunting",
+    "wasting": "Kategori wasting",
+    "stunting_status": "Status stunting",
+}
 
 
 @st.cache_data
@@ -80,9 +116,26 @@ def apply_theme():
         }
 
         .sidebar-brand {
-            padding: 0.35rem 0 1rem;
+            padding: 0 0 1rem;
             margin-bottom: 0.4rem;
             border-bottom: 1px solid var(--line);
+        }
+
+        .sidebar-logo-wrap {
+            background: #FFFFFF;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 8px 18px rgba(16, 42, 53, 0.07);
+        }
+
+        .sidebar-logo-wrap img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 96px;
+            object-fit: contain;
         }
 
         .sidebar-brand h2 {
@@ -243,6 +296,53 @@ def apply_theme():
         [data-testid="stMarkdownContainer"] {
             color: var(--body);
         }
+
+        [data-testid="stSidebar"] div[data-baseweb="select"] > div {
+            background: #FFFFFF;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--ink);
+            box-shadow: none;
+        }
+
+        [data-testid="stSidebar"] div[data-baseweb="select"] > div:hover,
+        [data-testid="stSidebar"] div[data-baseweb="select"] > div:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.16);
+        }
+
+        [data-testid="stSidebar"] div[data-baseweb="select"] span,
+        [data-testid="stSidebar"] div[data-baseweb="select"] svg {
+            color: var(--ink);
+            fill: var(--ink);
+        }
+
+        div[data-baseweb="popover"] ul,
+        div[data-baseweb="popover"] [role="listbox"] {
+            background: #FFFFFF;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 12px 28px rgba(16, 42, 53, 0.18);
+        }
+
+        div[data-baseweb="popover"] li,
+        div[data-baseweb="popover"] [role="option"] {
+            background: #FFFFFF;
+            color: var(--ink);
+        }
+
+        div[data-baseweb="popover"] li:hover,
+        div[data-baseweb="popover"] [role="option"]:hover {
+            background: var(--primary-soft);
+            color: var(--ink);
+        }
+
+        div[data-baseweb="popover"] li[aria-selected="true"],
+        div[data-baseweb="popover"] [role="option"][aria-selected="true"] {
+            background: #CFEAE4;
+            color: var(--ink);
+            font-weight: 700;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -264,6 +364,17 @@ def page_header(title, description):
 
 def render_sidebar(active_page=None):
     apply_theme()
+    if LOGO_PATH.exists():
+        logo_data = base64.b64encode(LOGO_PATH.read_bytes()).decode("utf-8")
+        st.sidebar.markdown(
+            f"""
+            <div class="sidebar-logo-wrap">
+                <img src="data:image/png;base64,{logo_data}" alt="SobatBalita logo">
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
     st.sidebar.markdown(
         """
         <div class="sidebar-brand">
@@ -302,6 +413,10 @@ def format_percent(value):
     return f"{value:.1f}%"
 
 
+def readable_table(df):
+    return df.rename(columns=TABLE_COLUMN_LABELS)
+
+
 def risk_rate(series):
     if len(series) == 0:
         return 0
@@ -336,17 +451,41 @@ def add_sidebar_filters(df, key_prefix="filter"):
 
 def apply_chart_layout(fig, height=420):
     fig.update_layout(
+        template=None,
         height=height,
-        paper_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#FFFFFF",
         plot_bgcolor="#FFFFFF",
-        font=dict(family="Arial", color="#102A35"),
-        margin=dict(l=20, r=20, t=55, b=20),
+        colorway=["#0F766E", "#E76F51", "#4C78A8", "#F4A261", "#B279A2", "#E9C46A", "#72B7B2"],
+        font=dict(family="Arial", color="#102A35", size=13),
+        title=dict(font=dict(color="#102A35", size=18), x=0.02, xanchor="left"),
+        legend=dict(font=dict(color="#102A35"), bgcolor="rgba(255,255,255,0.88)"),
+        margin=dict(l=80, r=35, t=75, b=70),
         legend_title_text="",
+        hoverlabel=dict(bgcolor="#FFFFFF", bordercolor="#C9DAD6", font=dict(color="#102A35")),
     )
+    fig.update_xaxes(
+        color="#102A35",
+        title_font=dict(color="#102A35"),
+        tickfont=dict(color="#102A35"),
+        gridcolor="#E6EFEC",
+        zerolinecolor="#C9DAD6",
+        automargin=True,
+        title_standoff=18,
+    )
+    fig.update_yaxes(
+        color="#102A35",
+        title_font=dict(color="#102A35"),
+        tickfont=dict(color="#102A35"),
+        gridcolor="#E6EFEC",
+        zerolinecolor="#C9DAD6",
+        automargin=True,
+        title_standoff=18,
+    )
+    fig.update_layout(uniformtext=dict(mode="show", minsize=10))
     return fig
 
 
-def bar_chart(data, x, y, color=None, title=None, category_orders=None, text=None):
+def bar_chart(data, x, y, color=None, title=None, category_orders=None, text=None, orientation="v"):
     fig = px.bar(
         data,
         x=x,
@@ -356,6 +495,14 @@ def bar_chart(data, x, y, color=None, title=None, category_orders=None, text=Non
         title=title,
         color_discrete_map=COLOR_MAP,
         category_orders=category_orders,
+        orientation=orientation,
+        labels=DISPLAY_LABELS,
     )
     fig.update_traces(textposition="outside", cliponaxis=False)
-    return apply_chart_layout(fig)
+    fig.update_layout(showlegend=False)
+    fig = apply_chart_layout(fig)
+    if orientation == "h":
+        fig.update_layout(margin=dict(l=145, r=70, t=75, b=55))
+        if category_orders and y in category_orders:
+            fig.update_yaxes(categoryorder="array", categoryarray=list(reversed(category_orders[y])))
+    return fig
