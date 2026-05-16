@@ -42,6 +42,3 @@ Dataset digunakan untuk analisis status gizi anak berdasarkan data antropometri:
 - berat badan
 - jenis kelamin
 
-## Author
-
-Ilham
