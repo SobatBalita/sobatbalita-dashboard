@@ -21,6 +21,7 @@ Dashboard dapat diakses melalui link berikut:
 - Analisis antropometri berdasarkan umur, tinggi badan, dan berat badan.
 - Analisis demografi berdasarkan jenis kelamin dan kelompok umur.
 - Insight dan kesimpulan otomatis berdasarkan filter yang dipilih.
+- Implementasi A/B testing menggunakan Python untuk membandingkan proporsi stunting dan wasting.
 - Filter interaktif untuk memilih jenis kelamin dan rentang umur.
 
 ## Halaman Dashboard
@@ -61,6 +62,28 @@ Dataset yang digunakan berada pada folder `data/df_clean.csv` dan memuat informa
 - kategori wasting
 - status stunting
 
+## A/B Testing
+
+Proyek ini juga dilengkapi implementasi A/B testing menggunakan Python pada file `ab_testing.py`.
+
+A/B testing dilakukan sebagai analisis perbandingan dua kelompok balita berdasarkan:
+
+- jenis kelamin: laki-laki vs perempuan
+- kelompok umur: 0-12 bulan vs 13-24 bulan
+
+Metrik yang diuji:
+
+- status stunting
+- status wasting
+
+Script A/B testing dapat dijalankan dengan perintah:
+
+```bash
+python ab_testing.py
+```
+
+Hasil pengujian digunakan untuk melihat apakah terdapat perbedaan proporsi stunting atau wasting yang signifikan antara dua kelompok. Karena dataset ini bersifat observasional, A/B testing pada proyek ini dipahami sebagai perbandingan kelompok, bukan eksperimen perlakuan langsung.
+
 ## Tech Stack
 
 - Python
@@ -72,6 +95,7 @@ Dataset yang digunakan berada pada folder `data/df_clean.csv` dan memuat informa
 
 ```text
 sobatbalita-dashboard/
+|-- ab_testing.py
 |-- app.py
 |-- dashboard_utils.py
 |-- requirements.txt
