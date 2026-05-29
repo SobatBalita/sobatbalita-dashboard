@@ -1,5 +1,4 @@
 from pathlib import Path
-import base64
 
 import pandas as pd
 import plotly.express as px
@@ -8,7 +7,10 @@ import streamlit as st
 
 DATA_PATH = Path(__file__).parent / "data" / "df_clean.csv"
 ASSETS_DIR = Path(__file__).parent / "assets"
-LOGO_PATH = ASSETS_DIR / "SobatBalita_Images.png"
+LOGO_CANDIDATES = [
+    ASSETS_DIR / "SobaBalita_Images.png",
+    ASSETS_DIR / "SobatBalita_Images.png",
+]
 
 COLOR_MAP = {
     "Normal": "#2A9D8F",
@@ -135,6 +137,20 @@ def apply_theme():
             width: 100%;
             height: auto;
             max-height: 96px;
+            object-fit: contain;
+        }
+
+        [data-testid="stSidebar"] [data-testid="stImage"] {
+            background: #FFFFFF;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 8px 18px rgba(16, 42, 53, 0.07);
+        }
+
+        [data-testid="stSidebar"] [data-testid="stImage"] img {
+            max-height: 108px;
             object-fit: contain;
         }
 
@@ -364,16 +380,12 @@ def page_header(title, description):
 
 def render_sidebar(active_page=None):
     apply_theme()
-    if LOGO_PATH.exists():
-        logo_data = base64.b64encode(LOGO_PATH.read_bytes()).decode("utf-8")
-        st.sidebar.markdown(
-            f"""
-            <div class="sidebar-logo-wrap">
-                <img src="data:image/png;base64,{logo_data}" alt="SobatBalita logo">
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    logo_path = next((path for path in LOGO_CANDIDATES if path.exists()), None)
+    if logo_path is None:
+        logo_path = next(iter(sorted(ASSETS_DIR.glob("*.png"))), None)
+
+    if logo_path is not None:
+        st.sidebar.image(str(logo_path), use_container_width=True)
 
     st.sidebar.markdown(
         """
