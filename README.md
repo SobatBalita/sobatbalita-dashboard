@@ -11,7 +11,7 @@ Dashboard dirancang agar visualisasi dan insight mudah dipahami oleh pengguna um
 
 Dashboard dapat diakses melalui link berikut:
 
-[https://pjclhgogxpjmtbmy2mty3d.streamlit.app/](https://pjclhgogxpjmtbmy2mty3d.streamlit.app/)
+[Dashboard Sobat Balita](https://pjclhgogxpjmtbmy2mty3d.streamlit.app/)
 
 ## Fitur Utama
 
