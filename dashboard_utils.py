@@ -8,7 +8,7 @@ import streamlit as st
 
 DATA_PATH = Path(__file__).parent / "data" / "df_clean.csv"
 ASSETS_DIR = Path(__file__).parent / "assets"
-LOGO_PATH = ASSETS_DIR / "277937024.png"
+LOGO_PATH = ASSETS_DIR / "SobatBalita_Images.png"
 
 COLOR_MAP = {
     "Normal": "#2A9D8F",
